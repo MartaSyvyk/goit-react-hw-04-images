@@ -10,5 +10,5 @@ export const FetchError = ({ errorMessage }) => {
 };
 
 FetchError.propTypes = {
-  errorMessage: PropTypes.string.isRequired,
+  errorMessage: PropTypes.string,
 };

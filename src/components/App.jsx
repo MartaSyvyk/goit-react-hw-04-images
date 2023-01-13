@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from './Modal/Modal';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
@@ -8,101 +8,84 @@ import { FetchError } from './Error/Error';
 import css from '../styles.module.css';
 import { BallTriangle } from 'react-loader-spinner';
 
-export class App extends React.Component {
-  state = {
-    images: null,
-    searchedImage: '',
-    status: 'idle',
-    isModalOpen: false,
-    page: 1,
-    currentImage: '',
-    error: '',
+export const App = () => {
+  const statusOptions = {
+    idle: 'idle',
+    pending: 'pending',
+    rejected: 'rejected',
+    resolved: 'resolved',
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.searchedImage !== this.state.searchedImage ||
-      prevState.page !== this.state.page
-    ) {
-      this.setState({
-        status: 'pending',
-      });
+  const [images, setImages] = useState('');
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [status, setStatus] = useState(statusOptions.idle);
+  const [error, setError] = useState('');
+  const [modal, setModal] = useState(false);
+  const [currentImg, setCurrentImg] = useState('');
 
-      fetchImages(this.state.searchedImage, this.state.page)
-        .then(response => {
-          this.setState(prevState => ({
-            images: [...prevState.images, ...response.hits],
-            status: 'resolved',
-          }));
-        })
-        .catch(error => this.setState({ error, status: 'rejected' }));
-    }
-  }
-
-  toggleModal = () => {
-    this.setState(prevState => ({
-      isModalOpen: !prevState.isModalOpen,
-    }));
-  };
-  handleOnLoadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-  };
-  formSubmitHandler = query => {
-    if (this.state.searchedImage === query) {
+  useEffect(() => {
+    if (query === '') {
       return;
     }
-    this.setState({
-      searchedImage: query,
-      images: '',
-      page: 1,
-    });
+    {
+      setStatus(statusOptions.pending);
+      fetchImages(query, page)
+        .then(response => {
+          setImages([...images, ...response.hits]);
+          setStatus(statusOptions.resolved);
+        })
+        .catch(error => setStatus(statusOptions.rejected), setError(error));
+    }
+  }, [page, query]);
+
+  const toggleModal = () => {
+    setModal(!modal);
   };
-  handleImageClick = imageId => {
-    this.setState({
-      currentImage: this.state.images.filter(image => image.id === imageId)[0]
-        .largeImageURL,
-    });
-    this.toggleModal();
+  const handleOnLoadMore = () => {
+    setPage(page + 1);
+  };
+  const formSubmitHandler = searchedImage => {
+    if (query === searchedImage) {
+      return;
+    }
+
+    setQuery(searchedImage);
+    setImages('');
+    setPage(1);
+  };
+  const handleImageClick = imageId => {
+    setCurrentImg(
+      images.filter(image => image.id === imageId)[0].largeImageURL
+    );
+    toggleModal();
   };
 
-  render() {
-    return (
-      <div className={css.App}>
-        {this.state.isModalOpen && (
-          <Modal onClose={this.toggleModal} url={this.state.currentImage} />
-        )}
-        <Searchbar submitHandler={this.formSubmitHandler} />
-        {this.state.images && (
-          <ImageGallery
-            data={this.state.images}
-            handleClick={this.handleImageClick}
-          />
-        )}
-        {this.state.status === 'pending' && (
-          <BallTriangle
-            height={100}
-            width={100}
-            radius={5}
-            color="#3f51b5"
-            ariaLabel="ball-triangle-loading"
-            wrapperClass={{}}
-            wrapperStyle={{
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              marginTop: '50px',
-              marginBottom: '50px',
-            }}
-            visible={true}
-          />
-        )}
-        {this.state.status === 'rejected' && <div>{this.state.error}</div>}
-        {this.state.images && <Button handleClick={this.handleOnLoadMore} />}
-        {this.state.status === 'rejected' && (
-          <FetchError errorMessage={this.state.searchedImage} />
-        )}
-      </div>
-    );
-  }
-}
+  return (
+    <div className={css.App}>
+      {modal && <Modal onClose={toggleModal} url={currentImg} modal={modal} />}
+      <Searchbar submitHandler={formSubmitHandler} />
+      {images && <ImageGallery data={images} handleClick={handleImageClick} />}
+      {status === 'pending' && (
+        <BallTriangle
+          height={100}
+          width={100}
+          radius={5}
+          color="#3f51b5"
+          ariaLabel="ball-triangle-loading"
+          wrapperClass={{}}
+          wrapperStyle={{
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            marginTop: '50px',
+            marginBottom: '50px',
+          }}
+          visible={true}
+        />
+      )}
+      {status === 'rejected' && <div>{error}</div>}
+      {images && <Button handleClick={handleOnLoadMore} />}
+      {status === 'rejected' && <FetchError errorMessage={query} />}
+    </div>
+  );
+};
