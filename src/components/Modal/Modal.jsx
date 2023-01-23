@@ -8,7 +8,7 @@ const modalRoot = document.querySelector('#modal-root');
 export const Modal = ({ onClose, modal, url }) => {
   useEffect(() => {
     window.addEventListener('keydown', handleClose);
-  }, [modal]);
+  }, [modal, handleClose]);
 
   const handleClose = event => {
     if (event.code === 'Escape' || event.target === event.currentTarget) {
