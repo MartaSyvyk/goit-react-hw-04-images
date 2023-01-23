@@ -29,7 +29,7 @@ export const App = () => {
     if (query === '') {
       return;
     }
-    {
+    
       setStatus(statusOptions.pending);
       fetchImages(query, page)
         .then(response => {
@@ -37,7 +37,7 @@ export const App = () => {
           setStatus(statusOptions.resolved);
         })
         .catch(fetchError => {setStatus(statusOptions.rejected); setError(fetchError)});
-    }
+    
   }, [page, query]);
 
   const toggleModal = () => {
