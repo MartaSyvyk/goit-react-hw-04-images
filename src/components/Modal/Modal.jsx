@@ -5,15 +5,17 @@ import PropTypes from 'prop-types';
 import { useCallback } from 'react';
 
 const modalRoot = document.querySelector('#modal-root');
-  const handleClose =  useCallback((event) => {
+
+export const Modal = ({ onClose, modal, url }) => {
+    const handleClose =  useCallback((event) => {
     if (event.code === 'Escape' || event.target === event.currentTarget) {
       onClose();
     }
-  });
-export const Modal = ({ onClose, modal, url }) => {
+  }, [modal]);
+  
   useEffect(() => {
     window.addEventListener('keydown', handleClose);
-  }, [modal, handleClose]);
+  }, [modal]);
 
 
 

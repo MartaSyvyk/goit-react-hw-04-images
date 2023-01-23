@@ -36,7 +36,7 @@ export const App = () => {
           setImages(prevState => [...prevState, ...response.hits]);
           setStatus(statusOptions.resolved);
         })
-        .catch(fetchError => {setStatus(statusOptions.rejected), setError(e=>fetchError )});
+        .catch(fetchError => {setStatus(statusOptions.rejected); setError(fetchError)});
     }
   }, [page, query]);
 
