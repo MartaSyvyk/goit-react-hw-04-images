@@ -8,13 +8,14 @@ import { FetchError } from './Error/Error';
 import css from '../styles.module.css';
 import { BallTriangle } from 'react-loader-spinner';
 
-export const App = () => {
   const statusOptions = {
     idle: 'idle',
     pending: 'pending',
     rejected: 'rejected',
     resolved: 'resolved',
   };
+export const App = () => {
+
 
   const [images, setImages] = useState('');
   const [query, setQuery] = useState('');
@@ -32,7 +33,7 @@ export const App = () => {
       setStatus(statusOptions.pending);
       fetchImages(query, page)
         .then(response => {
-          setImages([...images, ...response.hits]);
+          setImages(prevState => [...prevState, ...response.hits]);
           setStatus(statusOptions.resolved);
         })
         .catch(error => setStatus(statusOptions.rejected), setError(error));
