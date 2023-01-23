@@ -21,7 +21,7 @@ export const App = () => {
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState(statusOptions.idle);
-  const [error, setError] = useState('');
+  
   const [modal, setModal] = useState(false);
   const [currentImg, setCurrentImg] = useState('');
 
@@ -36,7 +36,7 @@ export const App = () => {
           setImages(prevState => [...prevState, ...response.hits]);
           setStatus(statusOptions.resolved);
         })
-        .catch(error => setStatus(statusOptions.rejected), setError(error));
+        .catch(setStatus(statusOptions.rejected));
     }
   }, [page, query]);
 
