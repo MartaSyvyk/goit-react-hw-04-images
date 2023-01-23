@@ -12,7 +12,7 @@ export const Modal = ({ onClose, modal, url }) => {
     if (event.code === 'Escape' || event.target === event.currentTarget) {
       onClose();
     }
-  }, [modal, onClose]); 
+  }, [onClose]); 
 
   useEffect(() => {
     window.addEventListener('keydown', handleClose);
