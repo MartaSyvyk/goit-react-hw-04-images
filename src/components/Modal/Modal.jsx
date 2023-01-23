@@ -7,12 +7,12 @@ import { useCallback } from 'react';
 const modalRoot = document.querySelector('#modal-root');
   
 export const Modal = ({ onClose, modal, url }) => {
-  
+
  const handleClose =  useCallback((event) => {
     if (event.code === 'Escape' || event.target === event.currentTarget) {
       onClose();
     }
-  }); 
+  }, [modal]); 
   useEffect(() => {
     window.addEventListener('keydown', handleClose);
   }, [modal, handleClose]);
